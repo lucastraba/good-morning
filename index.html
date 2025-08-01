@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G.O.O.D. M.O.R.N.I.N.G. Protocol Initialization System</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none; /* Make text non-selectable */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .terminal {
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(0, 20, 0, 0.9);
+            border: 2px solid #0f0;
+            padding: 20px;
+            box-shadow: 0 0 20px #0f0, inset 0 0 20px rgba(0, 255, 0, 0.1);
+            display: none;
+            margin: 20px;
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(0, 255, 0, 0.1);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanline {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .glitch {
+            animation: glitch 0.3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: 2px 0 #f00, -2px 0 #00f; }
+            50% { text-shadow: -2px 0 #f00, 2px 0 #00f; }
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #001100;
+            border: 1px solid #0f0;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0f0, #0ff);
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        .auth-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 3px;
+            margin: 20px auto;
+            max-width: 400px; /* Prevent overflow */
+            width: 100%;
+        }
+
+        .auth-cell {
+            aspect-ratio: 1;
+            background: #001100;
+            border: 1px solid #0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px; /* Smaller font for better fit */
+            min-height: 40px; /* Ensure minimum size */
+            max-height: 50px; /* Prevent too large */
+        }
+
+        .auth-cell:hover {
+            background: #003300;
+            box-shadow: 0 0 15px #0f0;
+        }
+
+        .auth-cell.active {
+            background: #0f0;
+            animation: pulse 1s infinite;
+        }
+
+        .auth-cell.hint {
+            animation: hint-pulse 2s infinite;
+        }
+
+        @keyframes hint-pulse {
+            0%, 100% { border-color: #0f0; }
+            50% { border-color: #ff0; box-shadow: 0 0 20px #ff0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px #0f0; }
+            50% { box-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }
+        }
+
+        .epic-button {
+            background: linear-gradient(45deg, #001100, #003300);
+            border: 2px solid #0f0;
+            color: #0f0;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s;
+        }
+
+        .epic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #0f0, inset 0 0 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .epic-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .warning {
+            color: #ff0;
+            animation: warning-pulse 1s infinite;
+        }
+
+        @keyframes warning-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .success {
+            color: #0ff;
+            font-size: 32px;
+            text-align: center;
+            text-shadow: 0 0 20px #0ff;
+            animation: success-glow 2s infinite;
+        }
+
+        @keyframes success-glow {
+            0%, 100% { text-shadow: 0 0 20px #0ff; }
+            50% { text-shadow: 0 0 40px #0ff, 0 0 60px #00f; }
+        }
+
+        #final-message {
+            font-size: 48px;
+            text-align: center;
+            color: #0f0;
+            text-shadow: 0 0 30px #0f0;
+            animation: epic-reveal 3s ease-out;
+            margin-top: 40px;
+        }
+
+        @keyframes epic-reveal {
+            0% { 
+                transform: scale(0) rotate(720deg);
+                opacity: 0;
+                filter: blur(20px);
+            }
+            50% {
+                transform: scale(1.2) rotate(360deg);
+            }
+            100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+                filter: blur(0);
+            }
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+
+        .quantum-fluctuation {
+            display: inline-block;
+            animation: quantum 0.1s infinite;
+        }
+
+        @keyframes quantum {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-1px); }
+            50% { transform: translateX(1px); }
+            75% { transform: translateX(-1px); }
+            100% { transform: translateX(0); }
+        }
+
+        .coffee-cup {
+            font-size: 40px;
+            display: inline-block;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+
+        .coffee-cup:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .coffee-cup.selected {
+            animation: coffee-spin 1s;
+        }
+
+        @keyframes coffee-spin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.3); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .alarm-button {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #f00, #800);
+            border: 5px solid #fff;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.1s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            padding: 10px;
+            box-sizing: border-box;
+            line-height: 1.2;
+        }
+
+        .alarm-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .alarm-button.hit {
+            animation: alarm-hit 0.5s;
+        }
+
+        @keyframes alarm-hit {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(0.9) rotate(-5deg); }
+            75% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .emoji-rain {
+            position: fixed;
+            top: -100px;
+            font-size: 40px;
+            animation: fall 3s linear;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(calc(100vh + 100px));
+            }
+        }
+
+        .error-text {
+            color: #f00;
+            text-align: center;
+            font-size: 20px;
+            animation: error-flash 0.5s 3;
+        }
+
+        @keyframes error-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .audio-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 20, 0, 0.8);
+            border: 1px solid #0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .audio-button {
+            background: #001100;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .audio-button:hover {
+            background: #003300;
+        }
+
+        .audio-button.active {
+            background: #0f0;
+            color: #000;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, -1px); }
+            20% { transform: translate(2px, 1px); }
+            30% { transform: translate(-1px, 2px); }
+            40% { transform: translate(1px, -2px); }
+            50% { transform: translate(-2px, 1px); }
+            60% { transform: translate(2px, -1px); }
+            70% { transform: translate(-1px, -2px); }
+            80% { transform: translate(1px, 2px); }
+            90% { transform: translate(-2px, -1px); }
+        }
+
+        @keyframes lightning-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 10px #ff0;
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 20px #ff0, 0 0 30px #fff;
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes coffee-popup {
+            0% { 
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% { 
+                transform: scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: scale(0.5) rotate(360deg) translateY(-50px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+    <div class="scanline"></div>
+    
+    <!-- Audio Controls -->
+    <div class="audio-controls">
+        <div>🎵 MUSIC CONTROL</div>
+        <button class="audio-button" id="music-toggle" onclick="toggleMusic()">PLAY MUSIC</button>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.3" 
+               style="width: 80px; margin: 5px;" onchange="setVolume(this.value)">
+    </div>
+    
+    <!-- Hidden YouTube music player - will be triggered after boot -->
+    <iframe id="youtube-player" 
+            style="display: none;" 
+            width="0" 
+            height="0"
+            src="https://www.youtube.com/embed/zZMg9ryeWOw?enablejsapi=1&autoplay=0&loop=1&playlist=zZMg9ryeWOw&controls=0"
+            frameborder="0" 
+            allow="autoplay; encrypted-media">
+    </iframe>
+    
+    <div id="start-screen" class="terminal" style="display: block;">
+        <h1 class="glitch">G.O.O.D. M.O.R.N.I.N.G. PROTOCOL v4.2.0</h1>
+        <p>Greetings Optimization & Operational Deployment</p>
+        <p>Morning Operational Readiness Notification Infrastructure Network Gateway</p>
+        <br>
+        <p style="text-align: center; font-size: 24px; color: #ff0;">⚠️ WARNING ⚠️</p>
+        <p style="text-align: center;">This system contains EXCESSIVE MORNING ENTHUSIASM</p>
+        <p style="text-align: center;">Prolonged exposure may cause:</p>
+        <ul style="margin: 20px auto; max-width: 400px;">
+            <li>Uncontrollable uncharacteristic positivity</li>
+            <li>Sudden appreciation for caffeinated drinks</li>
+            <li>Temporary loss of basic motor skills</li>
+            <li>Death</li>
+        </ul>
+        <br>
+        <button class="epic-button" onclick="startMorningProtocol()" style="font-size: 24px; padding: 20px 40px;">
+            🚀 INITIATE MORNING PROTOCOL 🚀
+        </button>
+        <p style="text-align: center; margin-top: 20px; opacity: 0.7; font-size: 12px;">
+            Click to begin your morning greeting
+        </p>
+    </div>
+    
+    <div id="boot-screen" class="terminal" style="display: none;">
+        <h1 class="glitch">G.O.O.D. M.O.R.N.I.N.G. PROTOCOL v4.2.0</h1>
+        <p>Greetings Optimization & Operational Deployment</p>
+        <p>Morning Operational Readiness Notification Infrastructure Network Gateway</p>
+        <br>
+        <p class="blink">INITIALIZING QUANTUM GREETING MATRIX<span class="loading-dots"></span></p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="boot-progress"></div>
+        </div>
+        <p id="boot-status">Loading morning modules...</p>
+    </div>
+
+    <div id="auth-screen" class="terminal" style="display: none;">
+        <h2 class="warning">⚠️ AUTHENTICATION REQUIRED ⚠️</h2>
+        <p>Click all cells containing the letter <span style="color: #ff0; font-size: 24px;">M</span> for MOTHERTRUCKING MORNING!</p>
+        <div class="auth-grid" id="auth-grid"></div>
+        <p>Attempts remaining: <span id="attempts">3</span></p>
+        <button class="epic-button" onclick="checkAuth()">VERIFY MORNING CLEARANCE</button>
+        <p id="auth-error" class="error-text" style="display: none;"></p>
+    </div>
+
+    <div id="coffee-screen" class="terminal" style="display: none;">
+        <h2>☕ CAFFEINE CALIBRATION REQUIRED ☕</h2>
+        <p>Select EXACTLY 3 coffee cups to achieve optimal morning energy levels:</p>
+        <div style="text-align: center; margin: 20px 0;">
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+            <span class="coffee-cup" onclick="selectCoffee(this)">☕</span>
+        </div>
+        <p id="coffee-status" style="text-align: center;">Selected: 0/3</p>
+        <button class="epic-button" id="coffee-button" onclick="checkCoffee()" disabled>BREW MORNING ESSENCE</button>
+    </div>
+
+    <div id="surprise-screen" class="terminal" style="display: none;">
+        <h2 style="color: #0ff;">☕ CAFFEINE PROTOCOLS INITIATED ☕</h2>
+        <p style="text-align: center; font-size: 20px;">Analyzing coffee selection...</p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="surprise-progress"></div>
+        </div>
+        <p id="surprise-status" style="text-align: center; margin: 20px;">Calculating optimal morning energy...</p>
+        <div id="surprise-reveal" style="display: none; text-align: center; width: 100%; padding: 20px; box-sizing: border-box;">
+            <h1 style="color: #f00; font-size: 48px; animation: glitch 0.5s infinite;">JUST KIDDING!</h1>
+            <h2 style="color: #ff0; font-size: 36px; margin: 20px 0;">COFFEE CLICKING FRENZY!</h2>
+            <p style="font-size: 24px; color: #0ff;">Get as much coffee as possible before time runs out!</p>
+
+            <!-- Coffee clicking game -->
+            <div id="coffee-game">
+                <div style="font-size: 32px; color: #ff0; margin: 20px 0;">
+                    Time: <span id="coffee-timer">10</span>s | Coffee: <span id="coffee-count">0</span>☕
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="coffee-time-progress"></div>
+                </div>
+                <div id="coffee-click-area" style="height: 200px; border: 3px solid #ff0; margin: 20px 0; position: relative; overflow: hidden; cursor: crosshair; background: rgba(20, 20, 0, 0.4); box-shadow: 0 0 20px #ff0;">
+                    <p style="margin: 80px 0; color: #ff0; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #ff0;">🎯 CLICK INSIDE THIS BOX FOR COFFEE! 🎯</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="alarm-screen" class="terminal" style="display: none;">
+        <h2>🚨 ALARM OBLITERATION 🚨</h2>
+        <p>YOU ARE AWAKE, DESTROY THE ALARM!</p>
+        <p style="text-align: center; color: #ff0;">CLICK FAST OR SUCCUMB TO ETERNAL SLUMBER</p>
+        <button class="alarm-button" id="alarm-btn" onclick="hitAlarm()">DESTROY!<br>🔥</button>
+        <p style="text-align: center;">DESTRUCTION REMAINING: <span id="alarm-hits">15</span></p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="alarm-progress"></div>
+        </div>
+        <p id="metal-feedback" style="text-align: center; font-size: 24px; color: #ff0; margin-top: 10px;"></p>
+    </div>
+
+    <div id="power-screen" class="terminal" style="display: none;">
+        <h2>⚡ LIGHTNING STORM MAYHEM ⚡</h2>
+        <p style="text-align: center; color: #f00; font-size: 24px;">LIGHTNING STORM INCOMING! CLICK FAST OR GET FRIED!</p>
+        <p style="text-align: center; color: #ff0;">Multiple ⚡ bolts will appear - CLICK THEM ALL!</p>
+        <div id="lightning-field" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin: 20px auto; max-width: 500px; height: 300px;">
+            <!-- Lightning bolts will be dynamically added here -->
+        </div>
+        <p style="text-align: center;">Power Level: <span id="power-level">0</span>/8</p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="power-progress"></div>
+        </div>
+        <p id="power-feedback" style="text-align: center; font-size: 20px; color: #ff0; margin-top: 10px;"></p>
+    </div>
+
+    <div id="final-screen" class="terminal" style="display: none;">
+        <h2 class="success">✓ ALL SYSTEMS OPERATIONAL ✓</h2>
+        <p>Morning protocols initialized successfully</p>
+        <p>Quantum entanglement with timezone: ESTABLISHED</p>
+        <p>Caffeine levels: EXCESSIVE (optimal)</p>
+        <p>Team morale boost: +1000%</p>
+        <p>Snooze resistance: MAXIMUM</p>
+        <p>Morning enthusiasm: OVERFLOWING</p>
+        <div id="final-message">
+            🌅 GOOD MORNING TEAM 🌅
+        </div>
+        <p style="text-align: center; margin-top: 20px; opacity: 0.7;">
+            Total morning initialization time: <span id="total-time">calculating...</span>
+        </p>
+    </div>
+
+    <script>
+        const startTime = Date.now();
+        
+        // Matrix rain background
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const matrix = "GOODMORNING01";
+        const matrixArray = matrix.split("");
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for(let x = 0; x < columns; x++) {
+            drops[x] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 35);
+
+
+        // Function to start the morning protocol when button is clicked
+        function startMorningProtocol() {
+            // Initialize audio immediately since this is a user interaction
+            initializeAudio();
+            
+            // Hide start screen and show boot screen
+            document.getElementById('start-screen').style.display = 'none';
+            const bootScreen = document.getElementById('boot-screen');
+            bootScreen.style.display = 'block';
+            
+            let progress = 0;
+            const bootProgress = setInterval(() => {
+                progress += Math.random() * 15;
+                if(progress > 100) progress = 100;
+                
+                document.getElementById('boot-progress').style.width = progress + '%';
+                
+                // Add loading sounds during boot
+                playLoadingBeep();
+                
+                const status = document.getElementById('boot-status');
+                const messages = [
+                    "Scanning temporal coordinates...",
+                    "Calibrating morning enthusiasm levels...",
+                    "Injecting caffeine simulation...",
+                    "Establishing quantum tunnel to Slack...",
+                    "Optimizing greeting algorithms...",
+                    "Loading excessive complexity modules..."
+                ];
+                
+                status.textContent = messages[Math.floor(progress / 20)] || "Finalizing...";
+                
+                if(progress >= 100) {
+                    clearInterval(bootProgress);
+                    setTimeout(() => {
+                        bootScreen.style.display = 'none';
+                        document.getElementById('auth-screen').style.display = 'block';
+                        initAuth();
+                        // Start YouTube music after boot completes
+                        startBackgroundMusic();
+                    }, 1000);
+                }
+            }, 200);
+        }
+
+        // Authentication grid with letters
+        let selectedCells = [];
+        const gridLetters = [];
+        // M pattern positions to form an actual M shape in 8x8 grid (0-63)
+        // Let's make a proper M shape:
+        // Row 1 (8-15): M at positions 9, 14 (left and right columns)
+        // Row 2 (16-23): M at positions 17, 18, 21, 22 (slanted inward)
+        // Row 3 (24-31): M at positions 25, 27, 28, 30 (meeting in middle)
+        // Row 4 (32-39): M at positions 33, 38 (back to columns)
+        // Row 5 (40-47): M at positions 41, 46 (bottom of M)
+        const mPositions = [9, 14, 17, 18, 21, 22, 25, 27, 28, 30, 33, 38, 41, 46]; // M pattern positions
+
+        function initAuth() {
+            const grid = document.getElementById('auth-grid');
+            
+            // Fill grid with random letters and Ms
+            for(let i = 0; i < 64; i++) {
+                if(mPositions.includes(i)) {
+                    gridLetters[i] = 'M';
+                } else {
+                    // Random letters that aren't M
+                    const letters = 'ABCDEFGHIJKLNOPQRSTUVWXYZ';
+                    gridLetters[i] = letters[Math.floor(Math.random() * letters.length)];
+                }
+            }
+            
+            // Create cells
+            for(let i = 0; i < 64; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'auth-cell';
+                cell.textContent = gridLetters[i];
+                cell.onclick = () => toggleCell(i);
+                
+                // Add hint animation to M cells after 15 seconds (give them more time to figure it out)
+                if(mPositions.includes(i)) {
+                    setTimeout(() => {
+                        if(document.getElementById('auth-screen').style.display !== 'none') {
+                            cell.classList.add('hint');
+                        }
+                    }, 15000);
+                }
+                
+                grid.appendChild(cell);
+            }
+        }
+
+        function toggleCell(index) {
+            const cells = document.querySelectorAll('.auth-cell');
+            cells[index].classList.toggle('active');
+            
+            if(selectedCells.includes(index)) {
+                selectedCells = selectedCells.filter(i => i !== index);
+            } else {
+                selectedCells.push(index);
+            }
+        }
+
+        function checkAuth() {
+            const attempts = document.getElementById('attempts');
+            const currentAttempts = parseInt(attempts.textContent);
+            const errorText = document.getElementById('auth-error');
+            
+            // Check if all M's are selected and no non-M's
+            const correctSelection = selectedCells.length === mPositions.length && 
+                                   selectedCells.every(i => mPositions.includes(i));
+            
+            if(correctSelection) {
+                // Ensure no alarm sounds are playing when transitioning
+                stopAlarmSound();
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('coffee-screen').style.display = 'block';
+            } else {
+                if(currentAttempts <= 1) {
+                    errorText.textContent = '❌ MORNING PROTOCOL FAILED! But hey, we all need coffee first. Refresh to try again!';
+                    errorText.style.display = 'block';
+                    attempts.textContent = '0';
+                    document.querySelector('.epic-button').disabled = true;
+                } else {
+                    attempts.textContent = currentAttempts - 1;
+                    errorText.textContent = '❌ Incorrect! Remember: M is for MORNING!';
+                    errorText.style.display = 'block';
+                    
+                    document.querySelectorAll('.auth-cell').forEach(cell => {
+                        cell.classList.add('glitch');
+                        setTimeout(() => cell.classList.remove('glitch'), 300);
+                    });
+                    
+                    setTimeout(() => {
+                        errorText.style.display = 'none';
+                    }, 2000);
+                }
+            }
+        }
+
+        // Coffee selection game
+        let selectedCoffees = 0;
+        
+        function selectCoffee(cup) {
+            if(cup.classList.contains('selected')) {
+                cup.classList.remove('selected');
+                selectedCoffees--;
+            } else if(selectedCoffees < 3) {
+                cup.classList.add('selected');
+                selectedCoffees++;
+            }
+            
+            document.getElementById('coffee-status').textContent = `Selected: ${selectedCoffees}/3`;
+            document.getElementById('coffee-button').disabled = selectedCoffees !== 3;
+        }
+
+        function checkCoffee() {
+            if(selectedCoffees === 3) {
+                // Coffee celebration
+                for(let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        const emoji = document.createElement('div');
+                        emoji.className = 'emoji-rain';
+                        emoji.textContent = '☕';
+                        emoji.style.left = Math.random() * window.innerWidth + 'px';
+                        document.body.appendChild(emoji);
+                        setTimeout(() => emoji.remove(), 3000);
+                    }, i * 100);
+                }
+                
+                // Immediate transition after coffee rain starts
+                // Ensure no alarm sounds are playing when transitioning
+                stopAlarmSound();
+                document.getElementById('coffee-screen').style.display = 'none';
+                document.getElementById('surprise-screen').style.display = 'block';
+                // Start the surprise loading immediately
+                setTimeout(startCoffeeOverdrive, 100);
+            }
+        }
+
+        // EXTREME METAL ALARM DESTRUCTION
+        let alarmHits = 15; // MORE HITS FOR MAXIMUM METAL!
+        let lastHitTime = 0;
+        let alarmSoundInterval = null;
+        let metalLevel = 0;
+        
+        // Start alarm sound when alarm screen appears
+        function startAlarmSound() {
+            try {
+                // Safety check: only start alarm sound if we're actually on the alarm screen
+                const alarmScreen = document.getElementById('alarm-screen');
+                if (alarmScreen.style.display !== 'block') {
+                    console.log('Not starting alarm sound - alarm screen not visible');
+                    return;
+                }
+
+                // Stop any existing alarm sound first to prevent stacking
+                stopAlarmSound();
+                alarmSoundInterval = setInterval(() => {
+                    // Double-check we're still on alarm screen before playing sound
+                    if (alarmScreen.style.display === 'block') {
+                        playAlarmBeep();
+                    } else {
+                        // Stop if we're no longer on alarm screen
+                        stopAlarmSound();
+                    }
+                }, 800); // Beep every 800ms
+            } catch (e) {
+                console.log('Could not start alarm sound');
+            }
+        }
+        
+        function stopAlarmSound() {
+            if (alarmSoundInterval) {
+                clearInterval(alarmSoundInterval);
+                alarmSoundInterval = null;
+            }
+        }
+        
+        // Global cleanup function for all sounds and timers
+        function stopAllSounds() {
+            stopAlarmSound();
+        }
+        
+        // Global cleanup function for all timers and intervals
+        function cleanupAllTimers() {
+            // Clear any running intervals
+            if (lightningInterval) {
+                clearInterval(lightningInterval);
+                lightningInterval = null;
+            }
+            if (alarmSoundInterval) {
+                clearInterval(alarmSoundInterval);
+                alarmSoundInterval = null;
+            }
+            if (coffeeGameInterval) {
+                clearInterval(coffeeGameInterval);
+                coffeeGameInterval = null;
+            }
+            if (coffeeEmojiInterval) {
+                clearInterval(coffeeEmojiInterval);
+                coffeeEmojiInterval = null;
+            }
+            
+            // Reset all game states
+            powerLevel = 0;
+            activeLightning = [];
+            alarmHits = 15;
+            metalLevel = 0;
+            lastHitTime = 0;
+            coffeeGameActive = false;
+            coffeeCount = 0;
+            coffeeTimeLeft = 10;
+        }
+        
+        // Loading beep sounds during boot sequence
+        let audioInitialized = false;
+        
+        function initializeAudio() {
+            if (!audioInitialized) {
+                try {
+                    if (!window.audioContext) {
+                        window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (window.audioContext.state === 'suspended') {
+                        window.audioContext.resume();
+                    }
+                    audioInitialized = true;
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+        }
+        
+        function playLoadingBeep() {
+            if (!audioInitialized) return;
+            
+            try {
+                const oscillator = window.audioContext.createOscillator();
+                const gainNode = window.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(window.audioContext.destination);
+                
+                // Random beep frequency for loading sounds
+                const frequency = 200 + Math.random() * 400; // 200-600 Hz
+                oscillator.frequency.setValueAtTime(frequency, window.audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.1, window.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + 0.1);
+                
+                oscillator.start(window.audioContext.currentTime);
+                oscillator.stop(window.audioContext.currentTime + 0.1);
+            } catch (e) {
+                // Skip audio if not supported
+            }
+        }
+        
+        function playAlarmBeep() {
+            if (!audioInitialized) {
+                initializeAudio();
+            }
+            if (!audioInitialized) return;
+            
+            try {
+                const oscillator = window.audioContext.createOscillator();
+                const gainNode = window.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(window.audioContext.destination);
+                
+                // Classic alarm beep - two quick high tones
+                oscillator.frequency.setValueAtTime(800, window.audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(1000, window.audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, window.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + 0.3);
+                
+                oscillator.start(window.audioContext.currentTime);
+                oscillator.stop(window.audioContext.currentTime + 0.3);
+            } catch (e) {
+                // Skip audio if not supported
+            }
+        }
+        
+        function hitAlarm() {
+            const now = Date.now();
+            const btn = document.getElementById('alarm-btn');
+            const feedback = document.getElementById('metal-feedback');
+            
+            console.log(`Alarm hit! Current hits: ${alarmHits}, Metal level: ${metalLevel}`);
+            
+            // EXTREME requirement - even faster clicking! (reduced time from 800ms to 1200ms to be less punishing)
+            if(lastHitTime && now - lastHitTime > 1200) {
+                console.log('Too slow! Resetting alarm');
+                alarmHits = 15; // Reset if too slow
+                metalLevel = 0;
+                document.getElementById('alarm-hits').textContent = alarmHits;
+                document.getElementById('alarm-progress').style.width = '0%'; // Reset progress bar
+                btn.textContent = 'PATHETIC!\n💀';
+                feedback.textContent = '🔥 YOU STILL ASLEEP?? FASTER! 🔥';
+                feedback.style.color = '#f00';
+                
+                // Screen flash red for failure
+                document.body.style.backgroundColor = '#300';
+                setTimeout(() => {
+                    document.body.style.backgroundColor = '#000';
+                    btn.textContent = 'DESTROY!\n🔥';
+                    feedback.textContent = '';
+                }, 1000);
+                
+                lastHitTime = 0;
+                return;
+            }
+            
+            lastHitTime = now;
+            alarmHits--;
+            metalLevel++;
+            btn.classList.add('hit');
+            setTimeout(() => btn.classList.remove('hit'), 200);
+            
+            // Prevent negative numbers
+            if(alarmHits < 0) {
+                console.log('Alarm hits went negative, fixing to 0');
+                alarmHits = 0;
+            }
+            
+            // EXTREME METAL FEEDBACK MESSAGES
+            const metalMessages = [
+                "💥 UNLEASHING FURY!",
+                "⚡ LIGHTNING STRIKES!",
+                "🔥 BLAZING DESTRUCTION!",
+                "🌪️ TORNADO OF RAGE!",
+                "💀 DEATH TO ALARMS!",
+                "🎸 SHREDDING REALITY!",
+                "⚡ THUNDEROUS POWER!",
+                "🔥 MOLTEN MORNING!",
+                "💥 EXPLOSIVE ENERGY!",
+                "🌋 VOLCANIC AWAKENING!",
+                "⚡ METAL OVERLOAD!",
+                "🔥 MAXIMUM DEVASTATION!",
+                "💀 ANNIHILATION MODE!",
+                "🎸 GUITAR SOLO OF DOOM!",
+                "⚡⚡ DOUBLE LIGHTNING! ⚡⚡"
+            ];
+            
+            if (metalLevel <= metalMessages.length) {
+                feedback.textContent = metalMessages[metalLevel - 1];
+                feedback.style.color = metalLevel > 10 ? '#f00' : '#ff0';
+            }
+            
+            // EXTREME VISUAL EFFECTS
+            btn.style.transform = `scale(${1 + metalLevel * 0.05}) rotate(${Math.random() * 20 - 10}deg)`;
+            btn.style.boxShadow = `0 0 ${20 + metalLevel * 3}px #f00, 0 0 ${40 + metalLevel * 5}px #ff0`;
+            
+            // Screen shake gets more intense (safer calculation to prevent negative values)
+            const shakeSpeed = Math.max(0.1, 0.3 - metalLevel * 0.01);
+            document.body.style.animation = `shake ${shakeSpeed}s`;
+            setTimeout(() => {
+                document.body.style.animation = '';
+                btn.style.transform = 'scale(1) rotate(0deg)';
+            }, 200);
+            
+            // Play extreme metal click sound
+            playMetalClick();
+            
+            document.getElementById('alarm-hits').textContent = alarmHits;
+            document.getElementById('alarm-progress').style.width = ((15 - alarmHits) / 15 * 100) + '%';
+            
+            if(alarmHits <= 0) {
+                console.log('ALARM DESTROYED! Starting transition...');
+                
+                // Disable further clicking
+                btn.onclick = null;
+                btn.style.cursor = 'not-allowed';
+                btn.textContent = 'DEAD!\n🔥';
+                feedback.textContent = '🎸 ALARM DESTROYED BY PURE METAL! 🎸';
+                feedback.style.color = '#0f0';
+                stopAlarmSound(); // Stop alarm sound when completed
+                
+                // Victory screen flash
+                for(let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        document.body.style.backgroundColor = i % 2 === 0 ? '#ff0' : '#f00';
+                    }, i * 100);
+                }
+                setTimeout(() => {
+                    document.body.style.backgroundColor = '#000';
+                }, 500);
+                
+                // Force transition to power screen
+                setTimeout(() => {
+                    console.log('Executing transition to power screen NOW');
+                    transitionToPowerScreen();
+                }, 1000);
+                
+                return; // Prevent any further execution
+            }
+        }
+        
+        // Dedicated function to handle transition from alarm to power screen
+        function transitionToPowerScreen() {
+            console.log('=== STARTING TRANSITION TO POWER SCREEN ===');
+            
+            // Clean up alarm section completely
+            stopAlarmSound();
+            cleanupAllTimers();
+            
+            // Force hide alarm screen
+            const alarmScreen = document.getElementById('alarm-screen');
+            alarmScreen.style.display = 'none';
+            console.log('Alarm screen hidden');
+            
+            // Reset power challenge state before showing
+            powerLevel = 0;
+            activeLightning = [];
+            if (lightningInterval) {
+                clearInterval(lightningInterval);
+                lightningInterval = null;
+            }
+            console.log('Power challenge state reset');
+            
+            // Show power screen immediately
+            const powerScreen = document.getElementById('power-screen');
+            powerScreen.style.display = 'block';
+            console.log('Power screen shown');
+            
+            // Start power challenge immediately
+            setTimeout(() => {
+                console.log('Starting power challenge');
+                startPowerChallenge();
+            }, 100);
+        }
+        
+        function playMetalClick() {
+            if (!audioInitialized) return;
+            
+            try {
+                const oscillator = window.audioContext.createOscillator();
+                const gainNode = window.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(window.audioContext.destination);
+                
+                // Metal power chord that gets more extreme
+                const baseFreq = 80 + metalLevel * 10; // Gets higher and more intense
+                oscillator.frequency.setValueAtTime(baseFreq, window.audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(baseFreq * 1.5, window.audioContext.currentTime + 0.05);
+                oscillator.type = 'sawtooth'; // Aggressive metal sound
+                
+                gainNode.gain.setValueAtTime(0.2 + metalLevel * 0.01, window.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + 0.15);
+                
+                oscillator.start(window.audioContext.currentTime);
+                oscillator.stop(window.audioContext.currentTime + 0.15);
+            } catch (e) {
+                // Skip audio if not supported
+            }
+        }
+
+        // Music control functions - will start after boot sequence
+        let isMusicPlaying = false;
+        let youtubePlayer = null;
+        
+        function startBackgroundMusic() {
+            // Start YouTube music automatically after boot, but with a small delay
+            setTimeout(() => {
+                const toggle = document.getElementById('music-toggle');
+                const iframe = document.getElementById('youtube-player');
+                
+                // Force reload the iframe with autoplay to trigger music
+                iframe.src = "about:blank"; // Clear first
+                setTimeout(() => {
+                    iframe.src = "https://www.youtube.com/embed/zZMg9ryeWOw?enablejsapi=1&autoplay=1&loop=1&playlist=zZMg9ryeWOw&controls=0&mute=0";
+                    toggle.textContent = 'STOP MUSIC';
+                    toggle.classList.add('active');
+                    isMusicPlaying = true;
+                }, 100);
+            }, 500);
+        }
+        
+        function toggleMusic() {
+            const toggle = document.getElementById('music-toggle');
+            const iframe = document.getElementById('youtube-player');
+            
+            if (isMusicPlaying) {
+                // Pause music by reloading iframe without autoplay
+                iframe.src = "https://www.youtube.com/embed/zZMg9ryeWOw?enablejsapi=1&autoplay=0&loop=1&playlist=zZMg9ryeWOw&controls=0";
+                toggle.textContent = 'PLAY MUSIC';
+                toggle.classList.remove('active');
+                isMusicPlaying = false;
+            } else {
+                // Start music by reloading iframe with autoplay
+                iframe.src = "https://www.youtube.com/embed/zZMg9ryeWOw?enablejsapi=1&autoplay=1&loop=1&playlist=zZMg9ryeWOw&controls=0";
+                toggle.textContent = 'STOP MUSIC';
+                toggle.classList.add('active');
+                isMusicPlaying = true;
+            }
+        }
+        
+        function setVolume(value) {
+            // YouTube iframe doesn't allow external volume control
+            // This is just for show - the volume slider will work on user's system volume
+            console.log('Volume set to:', value);
+        }
+
+        // Surprise screen functionality
+        function startCoffeeOverdrive() {
+            // Start immediately when surprise screen loads
+            let progress = 0;
+            const progressBar = document.getElementById('surprise-progress');
+            const status = document.getElementById('surprise-status');
+            const reveal = document.getElementById('surprise-reveal');
+            
+            const loadingMessages = [
+                "Analyzing coffee molecular structure...",
+                "Calculating caffeine quantum entanglement...",
+                "Initializing MAXIMUM OVERDRIVE protocols...",
+                "WARNING: Coffee levels exceeding safe parameters!",
+                "CRITICAL: Morning enthusiasm overload detected!",
+                "ENGAGING COFFEE APOCALYPSE MODE..."
+            ];
+            
+            const loadingInterval = setInterval(() => {
+                progress += 15 + Math.random() * 10;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                const messageIndex = Math.min(Math.floor(progress / 17), loadingMessages.length - 1);
+                status.textContent = loadingMessages[messageIndex] || "System overload imminent...";
+                
+                if (progress >= 100) {
+                    clearInterval(loadingInterval);
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                        reveal.style.display = 'block';
+                        // Auto-start the coffee clicking game immediately
+                        setTimeout(() => {
+                            startCoffeeClickingGame();
+                        }, 1000);
+                    }, 1000);
+                }
+            }, 200);
+        }
+        
+        // New interactive coffee clicking game
+        let coffeeGameActive = false;
+        let coffeeCount = 0;
+        let coffeeTimeLeft = 10;
+        let coffeeGameInterval = null;
+        let coffeeEmojiInterval = null;
+        
+        function startCoffeeClickingGame() {
+            const gameDiv = document.getElementById('coffee-game');
+            const clickArea = document.getElementById('coffee-click-area');
+            const timerSpan = document.getElementById('coffee-timer');
+            const countSpan = document.getElementById('coffee-count');
+            const progressBar = document.getElementById('coffee-time-progress');
+            
+            // Game is already visible, just ensure it's active
+            
+            // Reset game state properly
+            coffeeGameActive = true;
+            coffeeCount = 0;
+            coffeeTimeLeft = 10;
+            
+            // Update UI immediately
+            timerSpan.textContent = coffeeTimeLeft;
+            countSpan.textContent = coffeeCount;
+            progressBar.style.width = '0%';
+            
+            // Start screen shake immediately
+            document.body.style.animation = 'shake 0.5s infinite';
+            
+            // Set up click area
+            clickArea.innerHTML = '<p style="margin: 80px 0; color: #ff0; font-size: 20px; font-weight: bold; text-shadow: 0 0 10px #ff0;">🎯 CLICK INSIDE THIS BOX FOR COFFEE! 🎯</p>';
+            clickArea.onclick = (e) => {
+                if (!coffeeGameActive) return;
+                
+                coffeeCount++;
+                countSpan.textContent = coffeeCount;
+                
+                // Create coffee emoji at RANDOM position for better visibility and impact
+                const rect = clickArea.getBoundingClientRect();
+                const randomX = Math.random() * (rect.width - 60); // Leave margin for emoji size
+                const randomY = Math.random() * (rect.height - 60);
+
+                const coffeeEmoji = document.createElement('div');
+                const emojiVariants = ['☕', '⚡']; // Mix of coffee and energy emojis
+                coffeeEmoji.textContent = emojiVariants[Math.floor(Math.random() * emojiVariants.length)];
+                coffeeEmoji.style.cssText = `
+                    position: absolute;
+                    left: ${randomX}px;
+                    top: ${randomY}px;
+                    font-size: ${25 + Math.random() * 20}px;
+                    color: ${['#ff0', '#f80', '#fff', '#0ff'][Math.floor(Math.random() * 4)]};
+                    pointer-events: none;
+                    animation: coffee-popup 1s;
+                    z-index: 100;
+                    text-shadow: 0 0 10px currentColor;
+                `;
+                clickArea.appendChild(coffeeEmoji);
+                setTimeout(() => coffeeEmoji.remove(), 1000);
+                
+                // Play coffee sound
+                playCoffeeSound();
+            };
+            
+            // Start countdown timer
+            coffeeGameInterval = setInterval(() => {
+                coffeeTimeLeft--;
+                if (coffeeTimeLeft < 0) coffeeTimeLeft = 0; // Prevent negative time
+                timerSpan.textContent = coffeeTimeLeft;
+                progressBar.style.width = ((10 - coffeeTimeLeft) / 10 * 100) + '%';
+                
+                if (coffeeTimeLeft <= 0) {
+                    endCoffeeGame();
+                }
+            }, 1000);
+            
+            // Start emoji rain
+            startCoffeeEmojiRain();
+        }
+        
+        function startCoffeeEmojiRain() {
+            coffeeEmojiInterval = setInterval(() => {
+                if (!coffeeGameActive) return;
+                
+                const emoji = document.createElement('div');
+                emoji.className = 'emoji-rain';
+                emoji.textContent = ['☕', '🔥', '💥', '⚡'][Math.floor(Math.random() * 4)];
+                emoji.style.left = Math.random() * window.innerWidth + 'px';
+                emoji.style.fontSize = (20 + Math.random() * 30) + 'px';
+                emoji.style.color = ['#ff0', '#f00', '#0ff', '#fff'][Math.floor(Math.random() * 4)];
+                document.body.appendChild(emoji);
+                setTimeout(() => emoji.remove(), 3000);
+            }, 100); // Much faster emoji rain
+        }
+        
+        function endCoffeeGame() {
+            coffeeGameActive = false;
+            
+            // Clear intervals safely
+            if (coffeeGameInterval) {
+                clearInterval(coffeeGameInterval);
+                coffeeGameInterval = null;
+            }
+            if (coffeeEmojiInterval) {
+                clearInterval(coffeeEmojiInterval);
+                coffeeEmojiInterval = null;
+            }
+            
+            // Stop screen shake
+            document.body.style.animation = '';
+            
+            // Show final coffee score
+            const clickArea = document.getElementById('coffee-click-area');
+            clickArea.innerHTML = `
+                <div style="margin: 50px 0; color: #0f0;">
+                    <h2>COFFEE OVERLOAD ACHIEVED!</h2>
+                    <p style="font-size: 24px;">Total Coffee: ${coffeeCount}☕</p>
+                    <p style="font-size: 20px;">${coffeeCount > 20 ? 'LEGENDARY COFFEE MASTER!' : coffeeCount > 10 ? 'COFFEE CHAMPION!' : 'COFFEE NOVICE'}</p>
+                </div>
+            `;
+            
+            // Auto-advance to alarm after showing results
+            setTimeout(() => {
+                // CRITICAL: Stop any existing alarm sounds before starting new ones
+                stopAlarmSound();
+                cleanupAllTimers();
+
+                // Force hide all screens
+                document.querySelectorAll('.terminal').forEach(screen => {
+                    screen.style.display = 'none';
+                });
+
+                // Reset alarm state before showing
+                alarmHits = 15;
+                metalLevel = 0;
+                lastHitTime = 0;
+                document.getElementById('alarm-hits').textContent = alarmHits;
+                document.getElementById('alarm-progress').style.width = '0%';
+                document.getElementById('metal-feedback').textContent = '';
+                const alarmBtn = document.getElementById('alarm-btn');
+                alarmBtn.textContent = 'DESTROY!\n🔥';
+                alarmBtn.onclick = hitAlarm; // Re-enable clicking
+                alarmBtn.style.cursor = 'pointer';
+
+                document.getElementById('alarm-screen').style.display = 'block';
+                // Small delay to ensure cleanup is complete before starting alarm sound
+                setTimeout(() => {
+                    startAlarmSound();
+                }, 100);
+            }, 3000);
+        }
+        
+        function playCoffeeSound() {
+            if (!audioInitialized) return;
+            
+            try {
+                const oscillator = window.audioContext.createOscillator();
+                const gainNode = window.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(window.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800 + Math.random() * 400, window.audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, window.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + 0.1);
+                
+                oscillator.start(window.audioContext.currentTime);
+                oscillator.stop(window.audioContext.currentTime + 0.1);
+            } catch (e) {
+                // Skip audio if not supported
+            }
+        }
+        
+
+        // POWER LEVEL CHALLENGE - Interactive lightning clicking (now more manageable!)
+        let powerLevel = 0;
+        let activeLightning = [];
+        let lightningInterval;
+        
+        function startPowerChallenge() {
+            // Ensure clean state before starting
+            if (lightningInterval) {
+                clearInterval(lightningInterval);
+                lightningInterval = null;
+            }
+
+            // Reset all power challenge variables
+            powerLevel = 0;
+            activeLightning = [];
+
+            // Clear the lightning field and create grid
+            const field = document.getElementById('lightning-field');
+            field.innerHTML = '';
+
+            // Create 18 empty cells (6x3 grid)
+            for (let i = 0; i < 18; i++) {
+                const cell = document.createElement('div');
+                cell.style.cssText = `
+                    border: 1px solid #333;
+                    background: rgba(0, 10, 0, 0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+                field.appendChild(cell);
+            }
+
+            // Set initial UI state
+            document.getElementById('power-level').textContent = powerLevel;
+            document.getElementById('power-progress').style.width = '0%';
+            document.getElementById('power-feedback').textContent = '⚡ LIGHTNING STORM INCOMING! ⚡';
+
+            // Start screen shake for intensity
+            document.body.style.animation = 'shake 0.3s infinite';
+
+            // Start INTENSE lightning storm - multiple bolts, fast spawning!
+            lightningInterval = setInterval(() => {
+                if (powerLevel < 8) { // Reduced from 10 to 8 for faster completion
+                    // Spawn 2-3 lightning bolts at once for chaos!
+                    const numBolts = Math.floor(Math.random() * 2) + 2; // 2-3 bolts
+                    for (let i = 0; i < numBolts; i++) {
+                        setTimeout(() => spawnLightning(), i * 100); // Slight delay between each
+                    }
+                }
+            }, 800); // Much faster - every 0.8 seconds instead of 2.5!
+
+            // Spawn first wave immediately
+            spawnLightning();
+            setTimeout(() => spawnLightning(), 200);
+        }
+        
+        function spawnLightning() {
+            if (powerLevel >= 8) return; // Stop spawning when complete
+
+            const field = document.getElementById('lightning-field');
+            const cells = field.children;
+
+            // Find empty cells
+            const emptyCells = [];
+            for (let i = 0; i < cells.length; i++) {
+                if (!cells[i].hasChildNodes()) {
+                    emptyCells.push(i);
+                }
+            }
+
+            if (emptyCells.length === 0) return; // No empty cells
+
+            // Pick random empty cell
+            const randomIndex = Math.floor(Math.random() * emptyCells.length);
+            const cellIndex = emptyCells[randomIndex];
+            const targetCell = cells[cellIndex];
+
+            const lightning = document.createElement('div');
+            lightning.textContent = '⚡';
+            lightning.style.cssText = `
+                font-size: 45px;
+                cursor: pointer;
+                color: #ff0;
+                text-shadow: 0 0 15px #fff, 0 0 25px #ff0;
+                animation: lightning-pulse 0.3s infinite;
+                transition: all 0.1s;
+                user-select: none;
+            `;
+
+            lightning.onclick = () => hitLightning(lightning);
+            targetCell.appendChild(lightning);
+
+            // Store reference for cleanup
+            activeLightning.push(lightning);
+
+            // Auto-disappear after 1.5 seconds - MUCH faster!
+            setTimeout(() => {
+                if (lightning.parentNode) {
+                    lightning.style.opacity = '0.3';
+                    lightning.style.transform = 'scale(0.5)';
+                    lightning.onclick = null;
+                    // Remove from active list
+                    const index = activeLightning.indexOf(lightning);
+                    if (index > -1) activeLightning.splice(index, 1);
+                    // Remove from DOM after fade
+                    setTimeout(() => {
+                        if (lightning.parentNode) {
+                            lightning.remove();
+                        }
+                    }, 300);
+                }
+            }, 1500); // Much faster timeout!
+        }
+        
+        function hitLightning(lightning) {
+            powerLevel++;
+            const feedback = document.getElementById('power-feedback');
+
+            // Remove from active lightning list
+            const index = activeLightning.indexOf(lightning);
+            if (index > -1) activeLightning.splice(index, 1);
+
+            // EXPLOSIVE removal effect
+            lightning.style.fontSize = '70px';
+            lightning.style.color = '#fff';
+            lightning.style.textShadow = '0 0 30px #fff, 0 0 50px #ff0';
+            lightning.textContent = '💥';
+            lightning.onclick = null;
+
+            setTimeout(() => {
+                if (lightning.parentNode) {
+                    lightning.remove();
+                }
+            }, 150);
+
+            // Update UI
+            document.getElementById('power-level').textContent = powerLevel;
+            document.getElementById('power-progress').style.width = (powerLevel / 8 * 100) + '%'; // Updated for 8 total
+
+            // INTENSE power feedback messages
+            const powerMessages = [
+                "⚡ LIGHTNING STRIKE!",
+                "🔥 POWER SURGE!",
+                "💥 ELECTRIC CHAOS!",
+                "⚡ STORM FURY!",
+                "🌟 ENERGY OVERLOAD!",
+                "⚡ MAXIMUM VOLTAGE!",
+                "🔥 PLASMA STORM!",
+                "⚡⚡ ULTIMATE POWER! ⚡⚡"
+            ];
+
+            feedback.textContent = powerMessages[powerLevel - 1] || "⚡ STORM MASTER! ⚡";
+
+            // Play power-up sound
+            playPowerSound();
+
+            // INTENSE screen flash for each hit
+            document.body.style.backgroundColor = '#ff0';
+            setTimeout(() => {
+                document.body.style.backgroundColor = '#000';
+            }, 80);
+
+            if (powerLevel >= 8) { // Updated for 8 total
+                clearInterval(lightningInterval);
+                // Stop screen shake
+                document.body.style.animation = '';
+                completePowerChallenge();
+            }
+        }
+        
+        function completePowerChallenge() {
+            const feedback = document.getElementById('power-feedback');
+            feedback.textContent = '⚡ MAXIMUM POWER ACHIEVED! MORNING PROTOCOL COMPLETE! ⚡';
+            feedback.style.color = '#0f0';
+            
+            // Victory lightning effects
+            for(let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const lightning = document.createElement('div');
+                    lightning.className = 'emoji-rain';
+                    lightning.textContent = ['⚡', '💥', '🌟', '✨'][Math.floor(Math.random() * 4)];
+                    lightning.style.left = Math.random() * window.innerWidth + 'px';
+                    lightning.style.fontSize = '50px';
+                    lightning.style.color = '#ff0';
+                    lightning.style.textShadow = '0 0 20px #fff';
+                    document.body.appendChild(lightning);
+                    setTimeout(() => lightning.remove(), 3000);
+                }, i * 100);
+            }
+            
+            setTimeout(() => {
+                // Clean up everything before final screen
+                stopAllSounds();
+                cleanupAllTimers();
+
+                document.getElementById('power-screen').style.display = 'none';
+                document.getElementById('final-screen').style.display = 'block';
+
+                // Calculate total time
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('total-time').textContent = `${totalTime} seconds`;
+
+                // EPIC FINAL CELEBRATION EMOJI RAIN!
+                startFinalEmojiRain();
+            }, 3000);
+        }
+        
+        function playPowerSound() {
+            if (!audioInitialized) return;
+            
+            try {
+                const oscillator = window.audioContext.createOscillator();
+                const gainNode = window.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(window.audioContext.destination);
+                
+                // Electric zap sound
+                oscillator.frequency.setValueAtTime(1000 + powerLevel * 100, window.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(200, window.audioContext.currentTime + 0.1);
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0.3, window.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + 0.1);
+                
+                oscillator.start(window.audioContext.currentTime);
+                oscillator.stop(window.audioContext.currentTime + 0.1);
+            } catch (e) {
+                // Skip audio if not supported
+            }
+        }
+
+        // EPIC FINAL CELEBRATION EMOJI RAIN
+        function startFinalEmojiRain() {
+            const celebrationEmojis = [
+                '🌅', '☕', '⚡', '🔥', '💥', '🌟', '✨', '🎉', '🎊', '🚀',
+                '💪', '⭐', '🌈', '🎯', '🏆', '👑', '💎', '🌞', '🔆', '💫'
+            ];
+
+            // Create continuous emoji rain for 15 seconds
+            let emojiRainInterval = setInterval(() => {
+                // Spawn 3-5 emojis at once for density
+                const numEmojis = Math.floor(Math.random() * 3) + 3;
+
+                for (let i = 0; i < numEmojis; i++) {
+                    setTimeout(() => {
+                        const emoji = document.createElement('div');
+                        emoji.className = 'emoji-rain';
+                        emoji.textContent = celebrationEmojis[Math.floor(Math.random() * celebrationEmojis.length)];
+                        emoji.style.left = Math.random() * window.innerWidth + 'px';
+                        emoji.style.fontSize = (30 + Math.random() * 40) + 'px';
+                        emoji.style.color = ['#ff0', '#f80', '#fff', '#0ff', '#f0f', '#0f0'][Math.floor(Math.random() * 6)];
+                        emoji.style.textShadow = '0 0 20px currentColor';
+                        emoji.style.animationDuration = (2 + Math.random() * 2) + 's'; // Vary fall speed
+                        document.body.appendChild(emoji);
+                        setTimeout(() => emoji.remove(), 5000);
+                    }, i * 50); // Slight delay between each emoji
+                }
+            }, 300); // New wave every 300ms
+
+            // Stop emoji rain after 15 seconds
+            setTimeout(() => {
+                clearInterval(emojiRainInterval);
+            }, 15000);
+
+            // Add some extra special bursts
+            setTimeout(() => createEmojiBurst(), 2000);
+            setTimeout(() => createEmojiBurst(), 5000);
+            setTimeout(() => createEmojiBurst(), 8000);
+            setTimeout(() => createEmojiBurst(), 12000);
+        }
+
+        function createEmojiBurst() {
+            // Create a burst of emojis from center
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const emoji = document.createElement('div');
+                    emoji.textContent = ['🎉', '🎊', '✨', '🌟', '💫', '⭐'][Math.floor(Math.random() * 6)];
+                    emoji.style.cssText = `
+                        position: fixed;
+                        left: ${centerX}px;
+                        top: ${centerY}px;
+                        font-size: ${40 + Math.random() * 30}px;
+                        color: ${['#ff0', '#f80', '#fff', '#0ff', '#f0f'][Math.floor(Math.random() * 5)]};
+                        text-shadow: 0 0 20px currentColor;
+                        pointer-events: none;
+                        z-index: 1000;
+                        animation: burst-${Math.floor(Math.random() * 4)} 2s ease-out forwards;
+                    `;
+
+                    // Add random burst animation
+                    const angle = (Math.PI * 2 * i) / 20;
+                    const distance = 200 + Math.random() * 300;
+                    const endX = centerX + Math.cos(angle) * distance;
+                    const endY = centerY + Math.sin(angle) * distance;
+
+                    emoji.animate([
+                        { transform: 'translate(0, 0) scale(0) rotate(0deg)', opacity: 1 },
+                        { transform: `translate(${endX - centerX}px, ${endY - centerY}px) scale(1.5) rotate(720deg)`, opacity: 0.8, offset: 0.7 },
+                        { transform: `translate(${endX - centerX}px, ${endY - centerY + 100}px) scale(0.5) rotate(1080deg)`, opacity: 0 }
+                    ], {
+                        duration: 2000,
+                        easing: 'ease-out'
+                    });
+
+                    document.body.appendChild(emoji);
+                    setTimeout(() => emoji.remove(), 2000);
+                }, i * 30);
+            }
+        }
+    </script>
+</body>
+</html>
